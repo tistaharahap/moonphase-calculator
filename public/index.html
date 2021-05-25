@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Moon Phase Calculator</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            body {
+                font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+                background: #222;
+                color: #f0f0f0;
+            }
+            .center {
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                -webkit-transform: translate(-50%, -50%);
+                transform: translate(-50%, -50%);
+                line-height: 1.5em;
+            }
+            input[type=text] {
+                display: block;
+                margin: 10px 0;
+                width: 100%;
+                background-color: #222;
+                border: 0;
+                border-bottom: 1px solid #f0f0f0;
+                color: #f0f0f0;
+                font-size: 1em;
+            }
+            button#btn {
+                display: block;
+                position: absolute;
+                right: 0px;
+                padding: 5px;
+                margin-top: 10px;
+            }
+            h3 {
+                margin-top: 50px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="center">
+            <h1>Moon Phase Calculator</h1>
+            <input type="text" placeholder="Day" id="day" />
+            <input type="text" placeholder="Month" id="month" />
+            <input type="text" placeholder="Year" id="year" />
+            <button id="btn">Calculate</button>
+            <h3>Results</h3>
+            <p>
+                Phase: <span id="phase">n/a</span><br />
+                Light Intensity: <span id="light">n/a</span>
+            </p>
+        </div>
+        <script type="text/javascript">
+            (() => {
+                const elDay = document.getElementById('day')
+                const elMonth = document.getElementById('month')
+                const elYear = document.getElementById('year')
+                const elBtn = document.getElementById('btn')
+                const elPhase = document.getElementById('phase')
+                const elLight = document.getElementById('light')
+
+                const setDefaults = () => {
+                    const now = new Date()
+                    elDay.value = now.getDate()
+                    elMonth.value = now.getMonth() + 1
+                    elYear.value = now.getFullYear()
+                    elBtn.click()
+                }
+                elBtn.onclick = () => {
+                    const result = moonPhase(elDay.value, elMonth.value, elYear.value)
+                    elPhase.innerHTML = result[0]
+                    elLight.innerHTML = `${result[1]}%`
+                }
+
+                const moonPhase = (day, month, year) => {
+                    day = Number.parseInt(day)
+                    month = Number.parseInt(month)
+                    year = Number.parseInt(year)
+
+                    const ages = [18, 0, 11, 22, 3, 14, 25, 6, 17, 28, 9, 20, 1, 12, 23, 4, 15, 26, 7]
+                    const offsets = [-1, 1, 0, 1, 2, 3, 4, 5, 7, 7, 9, 9]
+                    const description = [
+                        "New (totally dark)",
+                        "Waxing crescent (increasing to full)",
+                        "In its first quarter (increasing to full)",
+                        "Waxing gibbous (increasing to full)",
+                        "Full (full light)",
+                        "Waning gibbous (decreasing from full)",
+                        "In its last quarter (decreasing from full)",
+                        "Waning crescent (decreasing from full)"
+                    ]
+                    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+
+                    if (day === 31) {
+                        day = 1
+                    }
+                    const daysIntoPhase = ((ages[(year + 1) % 19] + ((day + offsets[month - 1]) % 30) + (year < 1900)) % 30)
+                    let index = Number.parseInt((daysIntoPhase + 2) * 16 / 59.0)
+                    if (index > 7) {
+                        index = 7
+                    }
+                    const status = description[index]
+                    let light = Number.parseInt(2 * daysIntoPhase * 100 / 29)
+                    if (light > 100) {
+                        light = Math.abs(light - 200)
+                    }
+                    return [status, light]
+                }
+
+                setDefaults()
+            })()
+        </script>
+    </body>
+</html>
